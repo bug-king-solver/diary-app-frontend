@@ -2,18 +2,21 @@ import React, { useState } from 'react';
 import { Link, useHistory } from 'react-router-dom';
 import { FiChevronLeft } from 'react-icons/fi';
 
-import api from '../../services/api';
-import ApiAuthorization from '../../services/api';
+// import api from '../../services/api';
+// import ApiAuthorization from '../../services/api';
 
 import logoImg from '../../assets/lightLogo.png';
 
 import './styles.css';
+import { useDispatch } from 'react-redux';
+import { register } from '../../store/authActions';
 
 export default function Register() {
   const [firstName, setFirstName] = useState('');
   const [lastName, setLastName] = useState('');
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
+  const dispatch = useDispatch();
 
   const history = useHistory();
 
@@ -26,22 +29,26 @@ export default function Register() {
       password,
     };
 
-    await api.post('register', data)
-      .then(async()=>{
-        await api.post('authenticate', { email, password })
-        .then((response) => {
-          localStorage.setItem('AuthorizationToken',`Bearer ${response.data.token}`);
-          ApiAuthorization();
-          history.push('/profile');
-        })
-        .catch((err)=>{
-          alert(`Error authenticating: ${JSON.stringify(err.response.data.error)}`);
-          history.push('/');
-        });
-      })
-      .catch((err)=>{
-        alert(`Error signing up: ${JSON.stringify(err.response.data.error)}`);
-    });
+    dispatch(register(data));
+    localStorage.setItem('auth', JSON.stringify(data));
+    history.push('/');
+
+    // await api.post('register', data)
+    //   .then(async()=>{
+    //     await api.post('authenticate', { email, password })
+    //     .then((response) => {
+    //       localStorage.setItem('AuthorizationToken',`Bearer ${response.data.token}`);
+    //       ApiAuthorization();
+    //       history.push('/profile');
+    //     })
+    //     .catch((err)=>{
+    //       alert(`Error authenticating: ${JSON.stringify(err.response.data.error)}`);
+    //       history.push('/');
+    //     });
+    //   })
+    //   .catch((err)=>{
+    //     alert(`Error signing up: ${JSON.stringify(err.response.data.error)}`);
+    // });
   }
 
   return (

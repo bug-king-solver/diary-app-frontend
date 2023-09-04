@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 import { Link, useHistory } from 'react-router-dom';
 import { FiCornerRightUp } from 'react-icons/fi';
 
-import api from '../../services/api';
+// import api from '../../services/api';
 
 import './styles.css';
 
@@ -22,15 +22,25 @@ export default function Login () {
       password
     };
 
-    await api.post('authenticate', data)
-      .then((response)=>{
-        localStorage.setItem('AuthorizationToken',`Bearer ${response.data.token}`);
-        api.defaults.headers.common['Authorization'] = localStorage.getItem('AuthorizationToken');
-        history.push('/profile');
-      })
-      .catch((err)=>{
-        alert(`Error logging in: ${JSON.stringify(err.response.data.error)}`);
-      });
+    if (localStorage.getItem('auth') !== null) {
+      if (data.email === JSON.parse(localStorage.getItem('auth')).email && data.password === JSON.parse(localStorage.getItem('auth')).password) {
+        history.push('/profile')
+      } else {
+        alert("Credintials are incorrect.")
+      }
+    } else {
+      alert('Please register first.')
+      history.push('/register')
+    }
+
+    // await api.post('authenticate', data)
+    //   .then((response)=>{
+    //     localStorage.setItem('AuthorizationToken',`Bearer ${response.data.token}`);
+    //     api.defaults.headers.common['Authorization'] = localStorage.getItem('AuthorizationToken');
+    //   })
+    //   .catch((err)=>{
+    //     alert(`Error logging in: ${JSON.stringify(err.response.data.error)}`);
+    //   });
   }
 
   return (

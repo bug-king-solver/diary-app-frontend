@@ -1,37 +1,41 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState } from 'react';
 import { Link, useHistory } from 'react-router-dom';
 import { FiEye, FiEdit } from 'react-icons/fi';
 import Header from '../../components/Header';
 import moment from 'moment';
 
-import api from '../../services/api';
-import ApiAuthorization from '../../services/ApiAuthorization';
+// import api from '../../services/api';
+// import ApiAuthorization from '../../services/ApiAuthorization';
 
 import './styles.css';
+import { useSelector } from 'react-redux';
 
 export default function Profile() {
-  const [id, setId] = useState('');
-  const [firstName, setFirstName] = useState('');
-  const [lastName, setLastName] = useState('');
-  const [email, setEmail] = useState('');
+  // const [id, setId] = useState('');
+  // const [firstName, setFirstName] = useState('');
+  // const [lastName, setLastName] = useState('');
+  // const [email, setEmail] = useState('');
   const [createdAt, setCreatedAt] = useState('');
 
-  const history = useHistory();
+  // const history = useHistory();
+  
+  const email = JSON.parse(localStorage.getItem('auth')).email;
 
-  useEffect(() => {
-    ApiAuthorization();
-    api.get('profile')
-      .then(response => {
-        setId(response.data.id);
-        setFirstName(response.data.firstName);
-        setLastName(response.data.lastName);
-        setEmail(response.data.email);
-        setCreatedAt(response.data.createdAt);
-      }).catch((err) => {
-        alert(`Please log in to access this page: ${JSON.stringify(err.response.data.error)}`);
-        history.push('/');
-      });
-  }, [history]);
+
+  // useEffect(() => {
+  //   ApiAuthorization();
+  //   api.get('profile')
+  //     .then(response => {
+  //       setId(response.data.id);
+  //       setFirstName(response.data.firstName);
+  //       setLastName(response.data.lastName);
+  //       setEmail(response.data.email);
+  //       setCreatedAt(response.data.createdAt);
+  //     }).catch((err) => {
+  //       alert(`Please log in to access this page: ${JSON.stringify(err.response.data.error)}`);
+  //       history.push('/');
+  //     });
+  // }, [history]);
 
   return(
     <div>
@@ -39,11 +43,11 @@ export default function Profile() {
       <div className="profile-container">
         <div className="content">
           <section>
-            <h1>Hello {firstName}. How are you doing today?</h1>
-            <p>{firstName} {lastName}</p>
-            <p>Your id: {id}</p>
+            <h1>Hello, How are you doing today?</h1>
+            {/* <p>{firstName} {lastName}</p> */}
+            {/* <p>Your id: {id}</p> */}
             <p>Email address: {email}</p>
-            <p>Member since {moment(createdAt).format('MMMM Do YYYY')}</p>
+            {/* <p>Member since {moment(createdAt).format('MMMM Do YYYY')}</p> */}
           </section>
 
           <section>
