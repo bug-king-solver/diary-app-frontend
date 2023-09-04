@@ -10,6 +10,8 @@ import ApiAuthorization from '../../services/ApiAuthorization';
 import Emoji from '../../components/Emoji';
 
 import './styles.css';
+import { useDispatch, useSelector } from 'react-redux';
+import { updateLog } from '../../store/log/logActions';
 
 export default function EditLog({ match }) {
   const [logDataRetrievedFromServer, setLogDataRetrievedFromServer] = useState(false);
@@ -26,23 +28,31 @@ export default function EditLog({ match }) {
   const [createdAt, setCreatedAt] = useState('');
 
   const history = useHistory();
+  const logData = useSelector(state => state.log.log);
+  const dispatch = useDispatch();
 
   useEffect(()=>{
     setLogId(match.params.logId);
     if(logId){
-      ApiAuthorization();
-      api.get(`/profile/logs/${logId}`).then((response)=>{
-        setMood(response.data.mood);
-        setExerciseTime(response.data.exerciseTime);
-        setVitaminTaken(response.data.vitaminTaken);
-        setEnergyLevel(response.data.energyLevel);
-        setSleepQuality(response.data.sleepQuality);
-        setCalorieIntake(response.data.calorieIntake);
-        setCreatedAt(response.data.createdAt);
+        setMood(logData?.mood);
+        setExerciseTime(logData?.exerciseTime);
+        setVitaminTaken(logData?.vitaminTaken);
+        setEnergyLevel(logData?.energyLevel);
+        setSleepQuality(logData?.sleepQuality);
+        setCalorieIntake(logData?.calorieIntake);
         setLogDataRetrievedFromServer(true);
-      }).catch((err)=>{
-        console.log(err);
-      });
+      // ApiAuthorization();
+      // api.get(`/profile/logs/${logId}`).then((response)=>{
+      //   setMood(response.data.mood);
+      //   setExerciseTime(response.data.exerciseTime);
+      //   setVitaminTaken(response.data.vitaminTaken);
+      //   setEnergyLevel(response.data.energyLevel);
+      //   setSleepQuality(response.data.sleepQuality);
+      //   setCalorieIntake(response.data.calorieIntake);
+      //   setCreatedAt(response.data.createdAt);
+      //   setLogDataRetrievedFromServer(true);
+      // }).catch((err)=>{
+      // });
     }
   },[logId, match.params.logId]);
 
@@ -60,14 +70,18 @@ export default function EditLog({ match }) {
       vitaminTaken,
       sleepQuality,
     }
-
-    ApiAuthorization();
-    api.put(`/profile/logs/${logId}`, data).then(()=>{
-      alert('You successfully updated your log');
-      history.push('/profile/logs');
-    }).catch((err)=>{
-      alert(JSON.stringify(err.response.data.error));
-    });
+    const updatedData = {
+      id: Number(logId),
+      data
+    }
+    dispatch(updateLog(updatedData));
+    history.push('/profile/logs');
+    // ApiAuthorization();
+    // api.put(`/profile/logs/${logId}`, data).then(()=>{
+    //   alert('You successfully updated your log');
+    // }).catch((err)=>{
+    //   alert(JSON.stringify(err.response.data.error));
+    // });
   },[calorieIntake, energyLevel, exerciseTime, history, hoursExercising, logId, minutesExercising, mood, sleepQuality, vitaminTaken]);
 
   return(logDataRetrievedFromServer && (

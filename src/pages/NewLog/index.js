@@ -8,6 +8,8 @@ import api from '../../services/api';
 import ApiAuthorization from '../../services/ApiAuthorization';
 
 import './styles.css';
+import { useDispatch } from 'react-redux';
+import { addLog } from '../../store/log/logActions';
 
 export default function NewLog() {
   const [hoursExercising, setHoursExercising] = useState(0);
@@ -19,6 +21,8 @@ export default function NewLog() {
   const [mood, setMood] = useState('happy');
 
   const history = useHistory();
+
+  const dispatch = useDispatch();
 
   const handleSubmit = useCallback((event) => {
     event.preventDefault();
@@ -34,13 +38,14 @@ export default function NewLog() {
       vitaminTaken,
       sleepQuality,
     }
-
-    ApiAuthorization();
-    api.post('/profile/logs', data).then((response)=>{
-      history.push('/profile/logs');
-    }).catch((err)=>{
-      alert(JSON.stringify(err.response.data.error));
-    });
+    dispatch(addLog(data));
+    history.push('/profile/logs');
+    // ApiAuthorization();
+    // api.post('/profile/logs', data).then((response)=>{
+    //   history.push('/profile/logs');
+    // }).catch((err)=>{
+    //   alert(JSON.stringify(err.response.data.error));
+    // });
   },[calorieIntake, energyLevel, history, hoursExercising, minutesExercising, mood, sleepQuality, vitaminTaken]);
 
   return(

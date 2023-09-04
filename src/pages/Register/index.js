@@ -9,7 +9,7 @@ import logoImg from '../../assets/lightLogo.png';
 
 import './styles.css';
 import { useDispatch } from 'react-redux';
-import { register } from '../../store/authActions';
+import { register } from '../../store/auth/authActions';
 
 export default function Register() {
   const [firstName, setFirstName] = useState('');

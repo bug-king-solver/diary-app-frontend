@@ -10,6 +10,8 @@ import ApiAuthorization from '../../services/ApiAuthorization';
 import api from '../../services/api';
 
 import './styles.css';
+import { useDispatch, useSelector } from 'react-redux';
+import { findLog, removeLog } from '../../store/log/logActions';
 
 export default function ProfileLogs() {
   const [pagePagination, setPage] = useState(1);
@@ -26,52 +28,57 @@ export default function ProfileLogs() {
 
   const history = useHistory();
 
+  const dispatch = useDispatch();
+  const logData = useSelector(state => state.log.logs);
   useEffect(()=>{
+    setLogs(logData);
     setPage(1);
-    ApiAuthorization();
-    api.get('/profile/logs?page=1').then((response)=>{
-      setPage(2);
-      setLogs(response.data);
-      setNumLogs(response.headers['x-total-count']);
-      setAllowFetch(true);
-    }).catch((err)=>{
-      alert(`Please log in to access this page: ${JSON.stringify(err)}`);
-      history.push('/');
-    });
-  },[history]);
+    setNumLogs(logData.length);
+    // ApiAuthorization();
+    // api.get('/profile/logs?page=1').then((response)=>{
+    //   setPage(2);
+    //   setLogs(response.data);
+    //   setNumLogs(response.headers['x-total-count']);
+    //   setAllowFetch(true);
+    // }).catch((err)=>{
+    //   alert(`Please log in to access this page: ${JSON.stringify(err)}`);
+    //   history.push('/');
+    // });
+  },[history, logData]);
 
   async function fetchMoreListItems() {
-    if(allowFetch && hasMoreLogs){
-      setAllowFetch(false);
-      ApiAuthorization();
-      await api.get(`/profile/logs?page=${pagePagination}${moodFilter}${exerciseTimeFilter}${vitaminTakenFilter}${energyLevelFilter}${sleepQualityFilter}${calorieIntakeFilter}`).then((response)=>{
-        //If all items are loaded, do not fetch items anymore
-        if(response.data.length===0){
-          setHasMoreLogs(false);
-        } else {
-          setPage(pagePagination+1);
-          setLogs([ ...logs, ...response.data]);
-          setNumLogs(response.headers['x-total-count']);
-        }
-      }).catch((err)=>{
-        alert(`Please log in to access this page: ${JSON.stringify(err)}`);
-        history.push('/');
-      });
-      setAllowFetch(true);
-    }
+    // if(allowFetch && hasMoreLogs){
+    //   setAllowFetch(false);
+    //   ApiAuthorization();
+    //   await api.get(`/profile/logs?page=${pagePagination}${moodFilter}${exerciseTimeFilter}${vitaminTakenFilter}${energyLevelFilter}${sleepQualityFilter}${calorieIntakeFilter}`).then((response)=>{
+    //     //If all items are loaded, do not fetch items anymore
+    //     if(response.data.length===0){
+    //       setHasMoreLogs(false);
+    //     } else {
+    //       setPage(pagePagination+1);
+    //       setLogs([ ...logs, ...response.data]);
+    //       setNumLogs(response.headers['x-total-count']);
+    //     }
+    //   }).catch((err)=>{
+    //     alert(`Please log in to access this page: ${JSON.stringify(err)}`);
+    //     history.push('/');
+    //   });
+    //   setAllowFetch(true);
+    // }
   }
 
   async function handleEditLog(id) {
     history.push(`/profile/logs/update/${id}`);
+    dispatch(findLog(id));
   }
 
   async function handleDeleteLog(id) {
-    await api.delete(`/profile/logs/${id}`).then(() => {
-      setNumLogs(numLogs-1);
-      setLogs(logs.filter((log)=>(log.id!==id)));
-    }).catch((err)=>{
-      console.log(err);
-    });
+    dispatch(removeLog(id));
+    // await api.delete(`/profile/logs/${id}`).then(() => {
+    //   setNumLogs(numLogs-1);
+    //   setLogs(logs.filter((log)=>(log.id!==id)));
+    // }).catch((err)=>{
+    // });
   }
 
   async function handleFilterChange({ title='', check='', filterType='', filter='' }) {
@@ -300,12 +307,12 @@ export default function ProfileLogs() {
                 element={'ul'}
                 loadMore={allowFetch ? fetchMoreListItems : ()=>({})}
                 hasMore={true}
-                loader={hasMoreLogs ? <div className="loader" key={'loader-key'}>Loading ...</div> : <div className="loader" key={'loader-key'}>All items were loaded</div>}
+                // loader={hasMoreLogs ? <div className="loader" key={'loader-key'}>Loading ...</div> : <div className="loader" key={'loader-key'}>All items were loaded</div>}
                 useWindow={true}
                 threshold={5}
             >
               {logs.map(log => (
-                <li key={log.id}>
+                <li key={log.exerciseTime}>
                   <h2>{moment(log.createdAt).format('MMMM Do YYYY')}</h2>
                   <section>
                     <p>Calorie Intake: {log.calorieIntake}</p>
